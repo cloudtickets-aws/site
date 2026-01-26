@@ -32,7 +32,7 @@ function App() {
         <div className="live-indicator">
           <span className="dot"></span> EN VIVO
         </div>
-        <h1 className="main-title">AWS Cloud Tour 2026 v2☁️</h1>
+        <h1 className="main-title">AWS Cloud Tour 2026 ☁️</h1>
         <h2 className="sub-title">Los Libertadores Arena</h2>
         <p className="event-info">29 de febrero 2026 | 17:00 | Bogotá, Colombia</p>
       </div>
