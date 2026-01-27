@@ -99,7 +99,7 @@ function App() {
           disabled={!selected || loading} 
           onClick={confirmBooking}
         >
-          {loading ? 'CONECTANDO A AWS...' : 'RESERVAR AHORA'}
+          {loading ? 'CONECTANDO A AWS...' : 'Añadir al carrito'}
         </button>
       </aside>
     </div>
