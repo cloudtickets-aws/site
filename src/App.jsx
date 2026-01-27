@@ -4,8 +4,14 @@ import './App.css'
 function App() {
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false); // Control del modal
+  const [formData, setFormData] = useState({
+    nombre: '',
+    email: '',
+    cedula: '',
+    celular: ''
+  });
 
-  // Precios diferenciados
   const PRECIO_PLATEA = 450000;
   const PRECIO_GENERAL = 180000;
   const SERVICIO = 25000;
@@ -16,30 +22,38 @@ function App() {
   const handleSelect = (id) => setSelected(id);
   const currentPrice = selected?.startsWith('P') ? PRECIO_PLATEA : PRECIO_GENERAL;
 
-  const confirmBooking = () => {
+  // Función para manejar cambios en el formulario
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const confirmBooking = (e) => {
+    e.preventDefault();
     setLoading(true);
+    
+    // Aquí es donde enviaremos los datos a AWS API Gateway más adelante
     setTimeout(() => {
-      alert(`✅ Reserva exitosa para el AWS Cloud Tour\nAsiento: ${selected}\nEnviando evento a AWS EventBridge/SNS...`);
+      alert(`✅ Reserva exitosa para ${formData.nombre}\nAsiento: ${selected}\nEnviando confirmación a: ${formData.email}`);
       setLoading(false);
       setSelected(null);
+      setShowModal(false);
+      setFormData({ nombre: '', email: '', cedula: '', celular: '' });
     }, 1500);
   };
 
   return (
     <div className="main-layout">
-      {/* Banner Principal con AWS Cloud Tour */}
+      {/* Banner Principal */}
       <div className="event-banner">
-        <div className="live-indicator">
-          <span className="dot"></span> EN VIVO
-        </div>
+        <div className="live-indicator"><span className="dot"></span> EN VIVO</div>
         <h1 className="main-title">AWS Cloud Tour 2026 ☁️</h1>
         <h2 className="sub-title">Los Libertadores Arena</h2>
         <p className="event-info">29 de febrero 2026 | 17:00 | Bogotá, Colombia</p>
       </div>
 
+      {/* Mapa de Asientos */}
       <div className="arena-map">
         <div className="stage-box">ESCENARIO PRINCIPAL</div>
-        
         <div className="section-header">
           <span>Platea VIP</span>
           <span className="price-tag">${PRECIO_PLATEA.toLocaleString()}</span>
@@ -75,18 +89,9 @@ function App() {
       <aside className="checkout-card">
         <h2 className="summary-title">Resumen de Compra</h2>
         <div className="details-box">
-          <div className="row">
-            <span>Ubicación:</span>
-            <span className="highlight">{selected || 'No seleccionado'}</span>
-          </div>
-          <div className="row">
-            <span>Precio Unitario:</span>
-            <span>{selected ? `$${currentPrice.toLocaleString()}` : '-'}</span>
-          </div>
-          <div className="row">
-            <span>Cargo Servicio:</span>
-            <span>{selected ? `$${SERVICIO.toLocaleString()}` : '-'}</span>
-          </div>
+          <div className="row"><span>Ubicación:</span><span className="highlight">{selected || 'No seleccionado'}</span></div>
+          <div className="row"><span>Precio Unitario:</span><span>{selected ? `$${currentPrice.toLocaleString()}` : '-'}</span></div>
+          <div className="row"><span>Cargo Servicio:</span><span>{selected ? `$${SERVICIO.toLocaleString()}` : '-'}</span></div>
           <div className="total-box">
             <span>TOTAL</span>
             <span className="total-amount">
@@ -96,12 +101,48 @@ function App() {
         </div>
         <button 
           className="btn-confirm" 
-          disabled={!selected || loading} 
-          onClick={confirmBooking}
+          disabled={!selected} 
+          onClick={() => setShowModal(true)}
         >
-          {loading ? 'CONECTANDO A AWS...' : 'Añadir al carrito'}
+          AÑADIR AL CARRITO
         </button>
       </aside>
+
+      {/* MODAL DE DATOS DEL CLIENTE */}
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Finalizar Reserva</h3>
+            <p>Tienes 30 segundos para completar tus datos y asegurar tu asiento.</p>
+            <form onSubmit={confirmBooking}>
+              <input 
+                type="text" name="nombre" placeholder="Nombre Completo" 
+                required onChange={handleInputChange} value={formData.nombre} 
+              />
+              <input 
+                type="email" name="email" placeholder="Correo Electrónico" 
+                required onChange={handleInputChange} value={formData.email} 
+              />
+              <div className="form-row">
+                <input 
+                  type="text" name="cedula" placeholder="Cédula/ID" 
+                  required onChange={handleInputChange} value={formData.cedula} 
+                />
+                <input 
+                  type="tel" name="celular" placeholder="Celular" 
+                  required onChange={handleInputChange} value={formData.celular} 
+                />
+              </div>
+              <div className="modal-actions">
+                <button type="button" className="btn-cancel" onClick={() => setShowModal(false)}>Cancelar</button>
+                <button type="submit" className="btn-submit" disabled={loading}>
+                  {loading ? 'RESERVANDO...' : 'CONFIRMAR Y PAGAR'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
