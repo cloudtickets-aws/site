@@ -53,7 +53,7 @@ function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          event_id: "CONCIERTO_2026",
+          event_id: "AWS_CLOUD_TOUR",
           seat_id: selected,
           email: formData.email,
           user_id: formData.cedula
