@@ -9,6 +9,7 @@ function App() {
   const [reservationId, setReservationId] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [ticketLoading, setTicketLoading] = useState(false); // Nuevo para control de descarga
   
   const [formData, setFormData] = useState({
     nombre: '',
@@ -116,9 +117,31 @@ function App() {
     setFormData({ nombre: '', email: '', cedula: '', celular: '' });
   };
 
-  const handleDownloadTicket = () => {
-    alert('En producción, esto generaría un PDF del ticket');
+  // --- MODIFICACIÓN: Lógica real de descarga ---
+  const handleDownloadTicket = async () => {
+    if (!reservationId) {
+      alert("No hay una reserva activa.");
+      return;
+    }
+
+    setTicketLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/get-ticket?reservationId=${reservationId}`);
+      const data = await response.json();
+
+      if (response.ok && data.downloadUrl) {
+        window.open(data.downloadUrl, '_blank');
+      } else {
+        alert(`❌ Error: ${data.error || "No se pudo obtener el enlace de descarga"}`);
+      }
+    } catch (error) {
+      console.error("Error al obtener ticket:", error);
+      alert("❌ Error de conexión al generar el ticket");
+    } finally {
+      setTicketLoading(false);
+    }
   };
+  // --- FIN MODIFICACIÓN ---
 
   const handleAddToCalendar = () => {
     alert('En producción, esto agregaría el evento al calendario');
@@ -297,13 +320,13 @@ function App() {
 
           {/* Action Buttons */}
           <div className="action-buttons">
-            <button className="btn-download" onClick={handleDownloadTicket}>
+            <button className="btn-download" onClick={handleDownloadTicket} disabled={ticketLoading}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <polyline points="7 10 12 15 17 10"></polyline>
                 <line x1="12" y1="15" x2="12" y2="3"></line>
               </svg>
-              Descargar Ticket (PDF)
+              {ticketLoading ? 'Generando...' : 'Descargar Ticket (PDF)'}
             </button>
             <button className="btn-calendar" onClick={handleAddToCalendar}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
