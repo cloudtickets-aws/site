@@ -126,8 +126,12 @@ function App() {
 
     setTicketLoading(true);
     try {
-      const fileName = `ticket-${reservationId}.pdf`;
-      const response = await fetch(`${API_URL}/get-ticket?reservationId=${reservationId}`);
+      // 1. Aquí creas el nombre correcto
+      const fileName = `ticket-${reservationId}.pdf`; 
+      
+      // 2. AQUÍ ESTABA EL ERROR: Debes pasar 'fileName' en la URL, no 'reservationId'
+      const response = await fetch(`${API_URL}/get-ticket?reservationId=${fileName}`);
+      
       const data = await response.json();
 
       if (response.ok && data.downloadUrl) {
