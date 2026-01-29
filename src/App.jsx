@@ -126,6 +126,7 @@ function App() {
 
     setTicketLoading(true);
     try {
+      const fileName = `ticket-${reservationId}.pdf`;
       const response = await fetch(`${API_URL}/get-ticket?reservationId=${reservationId}`);
       const data = await response.json();
 
